@@ -46,6 +46,7 @@ export default function StageDetail({ stage: st, num, upStage, onRemoveWithUndo 
           <div className="col" style={{ gap: 8 }}>
             {st.activities.map(a => (
               <div key={a.id} className={'activity' + (a.done ? ' done' : '')}>
+                <div className="activity-thumb" style={{ backgroundImage: 'url(' + st.img.replace('w=1200', 'w=100') + ')' }} />
                 <input type="checkbox" checked={a.done} onChange={() => toggleItem('activities', a.id)} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div className="t" contentEditable suppressContentEditableWarning

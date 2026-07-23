@@ -12,11 +12,12 @@ const A = (t, d) => ({ id: t.slice(0, 12) + Math.random().toString(36).slice(2, 
           spots: [
             { n: 'Mount Batur', c: [-8.2422, 115.3750] }, { n: 'Tegalalang Reisterrassen', c: [-8.4312, 115.2777] },
             { n: 'Tirta Empul Tempel', c: [-8.4154, 115.3153] }, { n: 'Monkey Forest', c: [-8.5187, 115.2588] },
-            { n: 'Tibumana Wasserfall', c: [-8.5320, 115.3520] }
+            { n: 'Tibumana Wasserfall', c: [-8.5320, 115.3520] }, { n: 'Bali Swing', c: [-8.4633, 115.2470] }
           ],
           activities: [
             A('Mount Batur Sonnenaufgang', 'Tag 2 oder 3, Start 3:00 Uhr. Aktiver Vulkan (1.717 m), Guide Pflicht (~30 € p.P. inkl. Gipfel-Frühstück). Danach heiße Quellen.'),
             A('Tegalalang Reisterrassen', 'Vor 8 Uhr fast allein! Eintritt ~2 €. Bester Blick: Terrassen des Café Kopi Desa.'),
+            A('Bali Swing', 'Dschungel-Schaukeln hoch über dem Tal bei Bongkasa Pertiwi — das meistfotografierte Motiv Balis. Früh morgens vor den Bustouren hin. Eintritt ~25–35 €.'),
             A('Tirta Empul Tempel', 'Heilige Quelle aus dem 10. Jh. — am Reinigungsritual teilnehmen. Sarong wird geliehen.'),
             A('Couples Spa', '2–3 Std. einplanen. Karsa Spa (Dschungel), Taksu Spa (Boutique) oder Mandapa (Ritz-Carlton, Luxus).'),
             A('Sacred Monkey Forest', '1.200 Affen, alte Tempel, dichter Dschungel. Taschen gut verschließen!'),
