@@ -58,6 +58,15 @@ h2 { font-size: 30px; margin: 0; }
 [contenteditable]:focus { background: #fff; outline: 1.5px solid var(--accent); border-radius: 2px; }
 .x { border: none; background: none; color: #B4A98D; font-size: 17px; cursor: pointer; line-height: 1; padding: 2px 4px; border-radius: 2px; transition: color .15s, background .15s; }
 .x:hover { color: #C4562E; background: #F3EBD9; }
+.edit-btn { border: none; background: none; color: #B4A98D; font-size: 14px; cursor: pointer; line-height: 1; padding: 4px 5px; border-radius: 2px; transition: color .15s, background .15s; flex-shrink: 0; }
+.edit-btn:hover { color: var(--accent); background: #F3EBD9; }
+.edit-form { display: flex; flex-direction: column; gap: 6px; }
+.edit-input { border: 1px solid #CFC3A4; background: #fff; border-radius: 2px; padding: 6px 8px; font-family: 'Karla', sans-serif; font-size: 13.5px; color: var(--ink); outline: none; width: 100%; }
+.edit-input:focus { border-color: var(--accent); }
+.edit-done { align-self: flex-start; border: none; background: var(--accent); color: #FAF6EF; font-size: 12.5px; font-weight: 700; padding: 5px 12px; border-radius: 2px; cursor: pointer; }
+.add-row { display: flex; gap: 8px; }
+.add-row .add-input { flex: 1; }
+.add-row .add-input.small { flex: 0 0 40%; }
 .add-input { border: 1.5px dashed #CFC3A4; background: transparent; border-radius: 3px; padding: 12px 14px; font-family: 'Karla', sans-serif; font-size: 14.5px; color: var(--ink); outline: none; width: 100%; }
 .add-input.small { padding: 8px 10px; font-size: 13.5px; border-width: 1px; }
 

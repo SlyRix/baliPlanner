@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef, useState } from 'react'
 
 const nl = n => n === 0 ? 'Abflugtag' : (n === 1 ? '1 Nacht' : n + ' Nächte')
 
@@ -16,6 +16,9 @@ function EditableSpan({ value, className, onCommit }) {
 }
 
 export default function StageDetail({ stage: st, num, upStage, onRemoveWithUndo }) {
+  const [editingId, setEditingId] = useState(null)
+  const newActivityTitleRef = useRef(null)
+  const newActivityImgRef = useRef(null)
   const editItem = (key, iid, field) => v =>
     upStage(st.id, s => ({ ...s, [key]: s[key].map(x => x.id === iid ? { ...x, [field]: v } : x) }))
   const removeItem = (key, iid) => {
@@ -34,6 +37,16 @@ export default function StageDetail({ stage: st, num, upStage, onRemoveWithUndo 
       : { id: 'n' + Date.now(), t: v, d: '', price: '' }
     upStage(st.id, s => ({ ...s, [key]: s[key].concat(item) }))
   }
+  const addActivity = () => {
+    const t = newActivityTitleRef.current.value.trim()
+    if (!t) return
+    const img = newActivityImgRef.current.value.trim()
+    const day = Math.max(0, ...st.activities.map(a => a.day || 0))
+    newActivityTitleRef.current.value = ''
+    newActivityImgRef.current.value = ''
+    upStage(st.id, s => ({ ...s, activities: s.activities.concat({ id: 'n' + Date.now(), t, d: '', img, done: false, day }) }))
+  }
+  const onAddActivityKey = e => { if (e.key === 'Enter') addActivity() }
 
   const activitiesByDay = st.activities.reduce((acc, a) => {
     const day = a.day || 0
@@ -55,7 +68,7 @@ export default function StageDetail({ stage: st, num, upStage, onRemoveWithUndo 
       <div className="detail-grid">
         <div>
           <h3 style={{ fontSize: 22, margin: '0 0 4px' }}>Must-Dos</h3>
-          <div className="hint" style={{ marginBottom: 12 }}>Abhaken wenn erledigt · Text anklicken zum Bearbeiten · × entfernt den Punkt</div>
+          <div className="hint" style={{ marginBottom: 12 }}>Abhaken wenn erledigt · ✎ zum Bearbeiten · × entfernt den Punkt</div>
           <div className="col" style={{ gap: 16 }}>
             {dayKeys.map(day => (
               <div key={day}>
@@ -66,18 +79,36 @@ export default function StageDetail({ stage: st, num, upStage, onRemoveWithUndo 
                       <div className="activity-thumb" style={{ backgroundImage: 'url(' + (a.img || st.img.replace('w=1200', 'w=100')) + ')' }} />
                       <input type="checkbox" checked={a.done} onChange={() => toggleItem('activities', a.id)} />
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div className="t" contentEditable suppressContentEditableWarning
-                          onBlur={e => editItem('activities', a.id, 't')((e.target.textContent || '').trim())}>{a.t}</div>
-                        <div className="d" contentEditable suppressContentEditableWarning
-                          onBlur={e => editItem('activities', a.id, 'd')((e.target.textContent || '').trim())}>{a.d}</div>
+                        {editingId === a.id ? (
+                          <div className="edit-form">
+                            <input className="edit-input" defaultValue={a.t} placeholder="Titel"
+                              onBlur={e => editItem('activities', a.id, 't')(e.target.value.trim())} />
+                            <input className="edit-input" defaultValue={a.d} placeholder="Beschreibung"
+                              onBlur={e => editItem('activities', a.id, 'd')(e.target.value.trim())} />
+                            <input className="edit-input" defaultValue={a.img || ''} placeholder="Bild-Link (optional)"
+                              onBlur={e => editItem('activities', a.id, 'img')(e.target.value.trim())} />
+                            <button className="edit-done" onClick={() => setEditingId(null)}>Fertig</button>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="t">{a.t}</div>
+                            <div className="d">{a.d}</div>
+                          </>
+                        )}
                       </div>
+                      {editingId !== a.id && (
+                        <button className="edit-btn" title="Bearbeiten" onClick={() => setEditingId(a.id)}>✎</button>
+                      )}
                       <button className="x" title="Entfernen" onClick={() => removeItem('activities', a.id)}>×</button>
                     </div>
                   ))}
                 </div>
               </div>
             ))}
-            <input className="add-input" placeholder="+ Aktivität hinzufügen – Enter drücken" onKeyDown={addTo('activities')} />
+            <div className="add-row">
+              <input ref={newActivityTitleRef} className="add-input" placeholder="+ Aktivität hinzufügen" onKeyDown={onAddActivityKey} />
+              <input ref={newActivityImgRef} className="add-input small" placeholder="Bild-Link (optional)" onKeyDown={onAddActivityKey} />
+            </div>
           </div>
         </div>
 
