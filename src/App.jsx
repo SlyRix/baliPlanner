@@ -22,9 +22,22 @@ export default function App() {
   const [sel, setSel] = useState(0)
   const [toast, setToast] = useState(null)
   const toastTimer = useRef(null)
+  const syncedFromServer = useRef(false)
+
+  useEffect(() => {
+    fetch('/api/plan').then(r => r.ok ? r.json() : null)
+      .then(data => { if (data && Array.isArray(data.stages)) setPlan({ stages: data.stages, pack: data.pack || [] }) })
+      .catch(() => {})
+      .finally(() => { syncedFromServer.current = true })
+  }, [])
 
   useEffect(() => {
     try { localStorage.setItem(KEY, JSON.stringify({ stages, pack })) } catch (e) {}
+    if (!syncedFromServer.current) return
+    const t = setTimeout(() => {
+      fetch('/api/plan', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ stages, pack }) }).catch(() => {})
+    }, 600)
+    return () => clearTimeout(t)
   }, [stages, pack])
 
   const setStages = fn => setPlan(p => ({ ...p, stages: fn(p.stages) }))
@@ -75,7 +88,7 @@ export default function App() {
         onRemove={id => removeWithUndo(pack.find(x => x.id === id)?.t || 'Eintrag', () => setPack(ps => ps.filter(x => x.id !== id)))} />
       <Tips />
       <footer>
-        <div>Änderungen werden automatisch in diesem Browser gespeichert.</div>
+        <div>Änderungen werden automatisch gespeichert und mit allen Geräten geteilt.</div>
         <button onClick={resetAll}>Auf Originalplan zurücksetzen</button>
       </footer>
       {toast && (
