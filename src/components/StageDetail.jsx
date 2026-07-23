@@ -2,6 +2,12 @@ import React from 'react'
 
 const nl = n => n === 0 ? 'Abflugtag' : (n === 1 ? '1 Nacht' : n + ' Nächte')
 
+const dayLabel = (start, day) => {
+  const [y, m, d] = start.split('-').map(Number)
+  const date = new Date(y, m - 1, d + day)
+  return date.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })
+}
+
 function EditableSpan({ value, className, onCommit }) {
   return (
     <span className={className} contentEditable suppressContentEditableWarning
@@ -24,10 +30,17 @@ export default function StageDetail({ stage: st, num, upStage, onRemoveWithUndo 
     const v = e.target.value.trim(); if (!v) return
     e.target.value = ''
     const item = key === 'activities'
-      ? { id: 'n' + Date.now(), t: v, d: '', done: false }
+      ? { id: 'n' + Date.now(), t: v, d: '', done: false, day: Math.max(0, ...st.activities.map(a => a.day || 0)) }
       : { id: 'n' + Date.now(), t: v, d: '', price: '' }
     upStage(st.id, s => ({ ...s, [key]: s[key].concat(item) }))
   }
+
+  const activitiesByDay = st.activities.reduce((acc, a) => {
+    const day = a.day || 0
+    ;(acc[day] ||= []).push(a)
+    return acc
+  }, {})
+  const dayKeys = Object.keys(activitiesByDay).map(Number).sort((a, b) => a - b)
 
   return (
     <section>
@@ -43,18 +56,25 @@ export default function StageDetail({ stage: st, num, upStage, onRemoveWithUndo 
         <div>
           <h3 style={{ fontSize: 22, margin: '0 0 4px' }}>Must-Dos</h3>
           <div className="hint" style={{ marginBottom: 12 }}>Abhaken wenn erledigt · Text anklicken zum Bearbeiten · × entfernt den Punkt</div>
-          <div className="col" style={{ gap: 8 }}>
-            {st.activities.map(a => (
-              <div key={a.id} className={'activity' + (a.done ? ' done' : '')}>
-                <div className="activity-thumb" style={{ backgroundImage: 'url(' + st.img.replace('w=1200', 'w=100') + ')' }} />
-                <input type="checkbox" checked={a.done} onChange={() => toggleItem('activities', a.id)} />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="t" contentEditable suppressContentEditableWarning
-                    onBlur={e => editItem('activities', a.id, 't')((e.target.textContent || '').trim())}>{a.t}</div>
-                  <div className="d" contentEditable suppressContentEditableWarning
-                    onBlur={e => editItem('activities', a.id, 'd')((e.target.textContent || '').trim())}>{a.d}</div>
+          <div className="col" style={{ gap: 16 }}>
+            {dayKeys.map(day => (
+              <div key={day}>
+                <div className="day-label">Tag {day + 1} · {dayLabel(st.start, day)}</div>
+                <div className="col" style={{ gap: 8 }}>
+                  {activitiesByDay[day].map(a => (
+                    <div key={a.id} className={'activity' + (a.done ? ' done' : '')}>
+                      <div className="activity-thumb" style={{ backgroundImage: 'url(' + (a.img || st.img.replace('w=1200', 'w=100')) + ')' }} />
+                      <input type="checkbox" checked={a.done} onChange={() => toggleItem('activities', a.id)} />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div className="t" contentEditable suppressContentEditableWarning
+                          onBlur={e => editItem('activities', a.id, 't')((e.target.textContent || '').trim())}>{a.t}</div>
+                        <div className="d" contentEditable suppressContentEditableWarning
+                          onBlur={e => editItem('activities', a.id, 'd')((e.target.textContent || '').trim())}>{a.d}</div>
+                      </div>
+                      <button className="x" title="Entfernen" onClick={() => removeItem('activities', a.id)}>×</button>
+                    </div>
+                  ))}
                 </div>
-                <button className="x" title="Entfernen" onClick={() => removeItem('activities', a.id)}>×</button>
               </div>
             ))}
             <input className="add-input" placeholder="+ Aktivität hinzufügen – Enter drücken" onKeyDown={addTo('activities')} />

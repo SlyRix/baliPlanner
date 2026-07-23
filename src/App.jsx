@@ -7,7 +7,7 @@ import RouteMap from './components/RouteMap.jsx'
 import PackingList from './components/PackingList.jsx'
 import Tips from './components/Tips.jsx'
 
-const KEY = 'bali-hm-planner-v1'
+const KEY = 'bali-hm-planner-v2'
 
 function load() {
   try {
